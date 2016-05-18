@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -f $1/.heroku_toolbelt_url ]; then
+    echo "Heroku Toolbelt"
+    exit 0
+else
+    exit 1
+fi

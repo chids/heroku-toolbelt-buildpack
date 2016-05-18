@@ -1,0 +1,32 @@
+#!/bin/bash
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+declare -r BUILD_DIR="$1"
+declare -r CACHE_DIR="$2"
+declare -r URL=`cat ${BUILD_DIR}/.heroku_toolbelt_url`
+declare -r FILE=$(basename ${URL})
+declare -r PKG="${CACHE_DIR}/${FILE}"
+declare -r BIN_SRC="${CACHE_DIR}/bin"
+declare -r BIN_DST="${BUILD_DIR}/bin"
+
+if [ ! -f ${3}/HEROKU_API_KEY ]; then
+    echo "No HEROKU_API_KEY in environment"
+    exit 1
+fi
+
+mkdir -p ${BIN_SRC} ${BIN_DST}
+
+if [ -f "${PKG}" -a -f "${BIN_SRC}" ]; then
+  echo "Cached package found"
+else
+  rm -rf ${BIN_SRC}/*
+  echo "Downloading..."
+  echo "From ${URL} | indent"
+  echo "To: ${PKG}"
+  curl -s ${URL} > ${PKG}
+  tar -xf ${PKG} -C ${BIN_SRC}
+fi
+cp -r ${BIN_SRC}/* ${BIN_DST}
